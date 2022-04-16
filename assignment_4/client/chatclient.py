@@ -1,3 +1,21 @@
+#!/usr/bin/python3
+
+"""
+For the client, we use the select operation to get inputs from the user.
+
+Since at any time a socket may receive messages, or a user may want to send a message, we pass the server and stdin as
+possible inputs to be selected.
+When a message is available in any of them, it is printed.
+
+With this, the user can input their message anytime, and messages from the server can be printed without being blocked
+in a single thread.
+
+
+Commands:
+    PM - Sending a public message (broadcast to all online users)
+    DM - Sending a private message to a specific user
+    EX - Exiting from teh chat
+"""
 import socket
 import select
 import sys
@@ -7,12 +25,12 @@ def join_chat():
     try:
         while True:
 
-            sockets_list = [sys.stdin, server]
+            sockets_list = [sys.stdin, server]  # the list of possible input sources
 
             read_sockets, write_socket, error_socket = select.select(sockets_list, [], [])
 
             for socks in read_sockets:
-                if socks == server:
+                if socks == server:  # messages from the server
                     message = socks.recv(2048)
                     if message:
                         if message.decode().strip() == 'EXIT':

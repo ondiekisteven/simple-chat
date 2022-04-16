@@ -1,3 +1,4 @@
+#!/usr/bin/python3
 import json
 import logging
 import socket
@@ -121,12 +122,12 @@ def client_thread(conn):
                     logger.info(f'user data: {user}')
                     logger.info(f'connected: {authenticated_users.keys()}')
 
-                    if user['step'] == 1 and msg == 'EX':
+                    if msg == 'EX':
                         conn.sendall('EXIT'.encode())  # we send EXIT back to them so they exit on their side too
                         logout_user(username)
                         exit_thread()
 
-                    if user['step'] == 1 and msg == 'PM' or msg == 'PM':
+                    elif user['step'] == 1 and msg == 'PM' or msg == 'PM':
                         d = {'app': 'PM', 'step': 2}
                         update_user(username, d)
                         conn.sendall('[*] ENTER MESSAGE TO SEND: '.encode())
@@ -217,15 +218,14 @@ if __name__ == '__main__':
         server = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         server.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
 
-        if len(sys.argv) != 3:
+        if len(sys.argv) != 2:
             logger.info("Correct usage: script, IP address, port number")
             exit()
-        IP_address = str(sys.argv[1])  # get ip address from first argument
-        Port = int(sys.argv[2])  # get port from second argument
+        Port = int(sys.argv[1])  # get port from second argument
 
-        server.bind((IP_address, Port))
+        server.bind(('', Port))
         server.listen(100)  # listen for 100 incoming connections
-        logger.info(f'running server  on {IP_address}:{Port}')
+        logger.info(f'running server  on 0.0.0.0:{Port}')
 
         # start accepting connections
         handle_connections()
